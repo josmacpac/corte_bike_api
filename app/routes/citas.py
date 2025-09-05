@@ -77,6 +77,7 @@ def listar_citas():
         "tipo_mantenimiento": c.servicio.nombre,
         "fecha_ingreso": c.fecha_ingreso.isoformat(),
         "fecha_entrega_estimada": c.fecha_entrega.isoformat(),
+        "tecnico": c.tecnico.nombre,
         "estado": c.estado.name
     } for c in citas]
     return jsonify(resultado)
@@ -187,9 +188,6 @@ def horarios_disponibles():
 
     return {"disponibles": horarios_disponibles}
 
-## Editar cita
-
-
 @bp.route('/editar_cita/<int:id>', methods=['PATCH'])
 @jwt_required()
 def editar_cita(id):
@@ -229,5 +227,26 @@ def editar_cita(id):
 
     return jsonify({"msg": "Cita actualizada correctamente"}), 200
 
+@bp.route('/<int:id>', methods=['GET'] )   
+@jwt_required()
+def consultar_cita(id):
+    cita = Cita.query.get(id)
     
+
+    if not cita:
+        return jsonify({"error": "Cita no encontrado"}), 404
+    
+    return jsonify({
+        "id": cita.id,
+        "usuario": cita.usuario.nombre,   # usa la relación
+        "servicio": cita.servicio_id, # usa la relación
+        "tecnico": cita.tecnico_id,
+        "cantidad": cita.cantidad,
+        "descripcion": cita.descripcion,
+        "fecha_ingreso": cita.fecha_ingreso.strftime("%Y-%m-%d %H:%M:%S"),
+        "fecha_entrega": cita.fecha_entrega.strftime("%Y-%m-%d %H:%M:%S"),
+        "fecha_recibo": ("sin fecha" if cita.fecha_recibo is None else cita.fecha_recibo.strftime("%Y-%m-%d %H:%M:%S")), 
+        "estado": cita.estado.name
+    })
+
 

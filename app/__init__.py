@@ -15,7 +15,8 @@ def create_app():
     app.config.from_object(Config)
     app.config['SECRET_KEY'] = 'una_clave_muy_secreta'  # cambia esto por algo seguro
 
-    CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": "http://192.168.1.170:8080"}})
+    #CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": "http://192.168.1.170:8080"}})
+    CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": "http://172.168.0.93:8080"}})
 
     jwt = JWTManager(app) #Inicializar gestor de JWT
 
@@ -45,6 +46,9 @@ def create_app():
 
     from app.routes import tecnicos
     app.register_blueprint(tecnicos.bp)
+
+    from app.routes import bicis
+    app.register_blueprint(bicis.bp)
 
    
 

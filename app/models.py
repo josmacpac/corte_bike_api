@@ -23,9 +23,9 @@ class Cita(db.Model):
     cantidad = db.Column(db.Integer, nullable = False)
     descripcion = db.Column(db.String(100), nullable =True)
 
-    fecha_ingreso = db.Column(db.DateTime, default=datetime.utcnow)  # CURRENT_TIMESTAMP
-    fecha_entrega = db.Column(db.DateTime, nullable=False)
-    fecha_recibo = db.Column(db.DateTime, nullable=False)
+    fecha_ingreso = db.Column(db.DateTime, default=datetime.utcnow)  # fecha de reservacion
+    fecha_entrega = db.Column(db.DateTime, nullable=False) #fecha estimada de entrega
+    fecha_recibo = db.Column(db.DateTime, nullable=True) #fecha de recibo en taller
    
     estado = db.Column(db.Enum(EstadoCitaEnum), nullable=False)
 
@@ -81,7 +81,7 @@ class Tecnico(db.Model):
 
 class Bici(db.Model):
     __tablename__= 'bicis'
-    id = db.Column(db.Integer, primary_key=True)
+    id_bici = db.Column(db.Integer, primary_key=True)
     id_usuario = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
     marca = db.Column(db.String(50), nullable=False)
     modelo = db.Column(db.String(50), nullable=False)
