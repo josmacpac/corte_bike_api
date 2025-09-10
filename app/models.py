@@ -93,4 +93,11 @@ class Bici(db.Model):
 
     usuario = db.relationship("Usuario", backref="bicis")
 
+
+class MantenimientoBici(db.Model):
+    __tablename__ = 'bicis_cita'
+    id_bici_cita = db.Column(db.Integer, primary_key=True)
+    id_cita = db.Column(db.Integer, db.ForeignKey("citas.id"), nullable=False)
+    id_bici = db.Column(db.Integer, db.ForeignKey("bicis.id_bici"), nullable=False)
+
    

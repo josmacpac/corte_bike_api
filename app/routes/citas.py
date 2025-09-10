@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app import db
-from app.models import Cita, EstadoCitaEnum ##importamos la clase Cita
+from app.models import Cita, EstadoCitaEnum, MantenimientoBici ##importamos la clase Cita
 from datetime import datetime, timedelta, date, time
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt, verify_jwt_in_request
@@ -22,9 +22,12 @@ def crear_cita():
 
     idUsuario = int(data.get("idUsuario"))
     fechaCita = data.get("fechaHoraCita")
-    cantidadBicis = int(data.get("cantidadBicis"))
+    bicis = data.get('bicis')
+    cantidadBicis = len(bicis)
     tipoMantenimiento = data.get("tipoMantenimiento")
     descripcionCita = data.get("descripcionCita")
+
+    
 
     fechaEntrega = calculo.f_entrega(fechaCita, tipoMantenimiento)
     tecnicoAsignado = tecnico.asignar_tecnico(fechaCita)
@@ -35,6 +38,15 @@ def crear_cita():
     
     nueva_cita = Cita(usuario_id = idUsuario, cantidad = cantidadBicis, descripcion = descripcionCita , fecha_ingreso = fechaCita, fecha_entrega= fechaEntrega, servicio_id = int(tipoMantenimiento), tecnico_id = tecnicoAsignado, estado = EstadoCitaEnum.pendiente)
     db.session.add(nueva_cita)
+    db.session.commit()
+
+    for bici in bicis:
+        mantenimiento = MantenimientoBici(
+            id_cita=nueva_cita.id,
+            id_bici=int(bici)
+        )
+        db.session.add(mantenimiento)
+
     db.session.commit()
     
     # Forzar a CDMX (America/Mexico_City) al devolver
