@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app import db
-from app.models import Cita, EstadoCitaEnum, MantenimientoBici ##importamos la clase Cita
+from app.models import Cita, EstadoCitaEnum, MantenimientoBici, Tecnico ##importamos la clase Cita
 from datetime import datetime, timedelta, date, time
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt, verify_jwt_in_request
@@ -134,7 +134,7 @@ def listar_citas_finalizadas():
 
     return jsonify(resultado)
 
-
+ 
 
 def generar_horarios(inicio="09:00", final="19:00", intervalo=30):
         horarios = []
@@ -214,8 +214,10 @@ def editar_cita(id):
          cita.servicio_id = data["tipoMantenimiento"]
 
     if "tecnico" in data:
-        cita.tecnico = data["tecnico"]
-
+        tecnico_obj = Tecnico.query.get(data["tecnico"])  # buscar por ID
+        if not tecnico_obj:
+            return jsonify({"error": "Técnico no encontrado"}), 404
+        cita.tecnico = tecnico_obj
     if "fechaEntrega" in data:
         cita.fecha_entrega = datetime.fromisoformat(data["fechaEntrega"])
 

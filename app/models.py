@@ -26,6 +26,7 @@ class Cita(db.Model):
     fecha_ingreso = db.Column(db.DateTime, default=datetime.utcnow)  # fecha de reservacion
     fecha_entrega = db.Column(db.DateTime, nullable=False) #fecha estimada de entrega
     fecha_recibo = db.Column(db.DateTime, nullable=True) #fecha de recibo en taller
+    ##agregar fecha_finalizado
    
     estado = db.Column(db.Enum(EstadoCitaEnum), nullable=False)
 
@@ -92,6 +93,12 @@ class Bici(db.Model):
     color = db.Column(db.String(30), nullable=False)
 
     usuario = db.relationship("Usuario", backref="bicis")
+    mantenimientos = db.relationship(
+        "MantenimientoBici",
+        backref="bici",
+        cascade="all, delete-orphan"
+    )
+
 
 
 class MantenimientoBici(db.Model):
@@ -99,5 +106,8 @@ class MantenimientoBici(db.Model):
     id_bici_cita = db.Column(db.Integer, primary_key=True)
     id_cita = db.Column(db.Integer, db.ForeignKey("citas.id"), nullable=False)
     id_bici = db.Column(db.Integer, db.ForeignKey("bicis.id_bici"), nullable=False)
+
+     # Relación con la tabla Citas
+    cita = db.relationship("Cita", backref="mantenimiento_bici")
 
    

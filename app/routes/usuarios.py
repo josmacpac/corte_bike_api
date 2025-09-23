@@ -4,7 +4,9 @@ from app.models import Usuario, rolEnum ##importamos la clase Usuario
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt, verify_jwt_in_request
 from app.utils.auth_decorators import verificar_rol
+import re 
 
+EMAIL_REGEX = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
 
 bp = Blueprint('usuarios', __name__, url_prefix='/api/usuarios')
 
@@ -53,6 +55,22 @@ def registrar_cliente():
 
     if not all([nombre, email, domicilio, telefono, contrasena]):
         return jsonify({"error": "Faltan campos obligatorios"}), 400
+     # ✅ Validar correo con regex
+    if not re.match(EMAIL_REGEX, email):
+        return jsonify({"error": "El correo electrónico no es válido"}), 400
+
+    # ✅ Validar teléfono (solo 10 dígitos)
+    if not re.match(r'^[0-9]{10}$', telefono):
+        return jsonify({"error": "El teléfono debe contener 10 dígitos numéricos"}), 400
+
+    # ✅ Validar nombre (solo letras, espacios y acentos)
+    if not re.match(r'^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{3,50}$', nombre):
+        return jsonify({"error": "El nombre solo puede contener letras y espacios (3-50 caracteres)"}), 400
+
+    # ✅ Validar domicilio (permitir letras, números y símbolos básicos)
+    if not re.match(r'^[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ\s\.,#-]{5,100}$', domicilio):
+        return jsonify({"error": "El domicilio contiene caracteres no permitidos (5-100 caracteres)"}), 400
+
 
     if Usuario.query.filter_by(email=email).first(): 
         return jsonify({"error": "El correo ya está registrado"}), 400
@@ -87,6 +105,15 @@ def login():
     #comprobar que se igresen email y contraseña
     if not email or not contrasena:
         return jsonify({"error": "correo y contraseña son obligatorios"}), 400
+    
+    # ✅ Validar formato del correo
+    if not re.match(EMAIL_REGEX, email):
+        return jsonify({"error": "Correo electrónico no válido"}), 400
+
+    # ✅ Validar que la contraseña no tenga caracteres extraños
+    # Solo letras, números y algunos símbolos comunes
+    if not re.match(r'^[A-Za-z0-9@#$%^&+=!.\-_*]{6,50}$', contrasena):
+        return jsonify({"error": "La contraseña contiene caracteres no permitidos"}), 400
     
     #Buscar usuario  por su correo 
     usuario = Usuario.query.filter_by(email=email).first()  #consulta a BD y verificar si existe 
