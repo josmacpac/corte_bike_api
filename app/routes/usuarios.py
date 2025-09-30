@@ -254,3 +254,36 @@ def perfil_usuario():
         "email": usuario.email,
         "rol": rol
     }), 200
+
+@bp.route('/buscar', methods=['GET'])
+@jwt_required()
+def buscar_usuarios():
+    query = request.args.get("nombre", "", type=str).strip()
+    
+    if not query:
+        return jsonify([]), 200  # si no mandan nada, regresa lista vacía
+
+    try:
+        # Filtramos solo clientes y coincidencia parcial por nombre
+        usuarios = (
+            Usuario.query
+            .filter(
+                Usuario.rol == rolEnum.cliente,   # solo clientes
+                Usuario.nombre.ilike(f"%{query}%")  # búsqueda insensible a mayúsculas
+            )
+            .all()
+        )
+
+        resultados = [
+            {
+                "id": u.id,
+                "nombre": u.nombre,
+                "email": u.email,
+                "telefono": u.telefono
+            }
+            for u in usuarios
+        ]
+
+        return jsonify(resultados), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

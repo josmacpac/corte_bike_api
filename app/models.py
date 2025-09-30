@@ -26,7 +26,7 @@ class Cita(db.Model):
     fecha_ingreso = db.Column(db.DateTime, default=datetime.utcnow)  # fecha de reservacion
     fecha_entrega = db.Column(db.DateTime, nullable=False) #fecha estimada de entrega
     fecha_recibo = db.Column(db.DateTime, nullable=True) #fecha de recibo en taller
-    ##agregar fecha_finalizado
+    fecha_finalizado = db.Column(db.DateTime, nullable=True) ##agregar fecha_finalizado
    
     estado = db.Column(db.Enum(EstadoCitaEnum), nullable=False)
 

@@ -230,6 +230,9 @@ def editar_cita(id):
     if "fechaRecibo" in data:
         cita.fecha_recibo = datetime.fromisoformat(data["fechaRecibo"])
 
+    if "fechaFinalizado" in data:
+        cita.fecha_finalizado = datetime.fromisoformat(data["fechaFinalizado"])    
+
     if "cantidad" in data:
         cita.cantidad = data["cantidad"]
 

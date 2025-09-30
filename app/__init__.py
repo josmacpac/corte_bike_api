@@ -50,6 +50,9 @@ def create_app():
     from app.routes import bicis
     app.register_blueprint(bicis.bp)
 
+    from app.routes import reportes
+    app.register_blueprint(reportes.bp)
+
    
 
 
